@@ -1,22 +1,24 @@
 /*
- * @Date: 2020-09-30 19:08:03
+ * @Date: 2020-10-10 14:10:00
  * @LastEditors: zhangbaoyan
- * @LastEditTime: 2020-10-10 14:02:19
- * @FilePath: /study/webpack/myWebpack/webpack.config.js
+ * @LastEditTime: 2020-10-10 15:19:13
+ * @FilePath: /study/webpack/myWebpack/config/webpack.base.conf.js
  */
 
 const path = require('path')
 
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
-
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
+// 开启缓存
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+
+// 进度条
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+
 module.exports = {
-    // 模式
-    mode: 'development', 
 
     // 入口
     entry: './src/main.js',
@@ -24,7 +26,7 @@ module.exports = {
     // 出口
     output: {
         filename: 'js/[name][chunkhash].js',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, '../dist')
     },
 
     // loader 
@@ -49,9 +51,8 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    
-                    // MiniCssExtractPlugin.loader,
                     'style-loader',
+                    MiniCssExtractPlugin.loader,
                     'css-loader',
                     'postcss-loader',
                 ]
@@ -59,9 +60,8 @@ module.exports = {
             {
                 test: /\.less$/i,
                 use: [
-                    // 'style-loader',
-                    // MiniCssExtractPlugin.loader,
                     'style-loader',
+                    MiniCssExtractPlugin.loader,
                     'css-loader',
                     'less-loader',
                 ]    
@@ -112,19 +112,22 @@ module.exports = {
         ]
     },
 
+
     // 插件
     plugins: [
         // new webpack.ProgressPlugin(),
+        new ProgressBarPlugin(),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'vue',
             filename: 'index.html',
             template: 'src/plugin/index.html'
         }),
-        // new MiniCssExtractPlugin({
-        //     filename: '../css/[name].css'
-        // }),
+        new MiniCssExtractPlugin({
+            filename: '/css/[name].css'
+        }),
         new VueLoaderPlugin(),
+        new HardSourceWebpackPlugin()
         
         
     ],
@@ -134,12 +137,4 @@ module.exports = {
             'vue$': 'vue/dist/vue.esm.js'
         }
     },
-
-    devServer: {
-        contentBase: path.resolve(__dirname, 'dist'),
-        compress: true,
-        port: 9000,
-        open: true
-    }
-
 }
